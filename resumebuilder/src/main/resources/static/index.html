@@ -6,8 +6,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
     <title>ResumeForge Pro — Ultimate ATS Builder</title>
     <meta name="description" content="Build stunning, ATS-friendly resumes with real-time preview and instant PDF generation.">
-    <!-- Fonts: Inter for UI, Playfair/Lato kept as backup, but preview will use classic Serif for Jake's vibe -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Lato:wght@300;400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <!-- Fonts: Inter for UI, Playfair/Lato for Modern, JetBrains Mono for Tech -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Lato:wght@300;400;700&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     
     <style>
@@ -239,7 +239,7 @@
             flex: 1;
             min-height: 0;
             overflow: hidden;
-            position: relative;
+            position: relative; /* MOBILE FIX */
         }
 
         .editor-panel { 
@@ -269,7 +269,7 @@
             overflow-y: auto; 
             padding: 32px; 
             min-height: 0;
-            -webkit-overflow-scrolling: touch;
+            -webkit-overflow-scrolling: touch; /* MOBILE FIX: Smooth scroll */
         }
 
         .section-header { 
@@ -458,7 +458,8 @@
 
         input[type="text"],
         input[type="email"],
-        textarea { 
+        textarea,
+        select { 
             width: 100%; 
             padding: 12px 14px 12px 42px; 
             background: var(--sidebar-input-bg); 
@@ -471,10 +472,26 @@
             font-family: 'Inter', sans-serif;
         }
 
-        input::placeholder, textarea::placeholder { color: rgba(136,146,164,0.5); }
-        input:hover, textarea:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); }
+        select {
+            padding: 12px 14px; /* Adjust for select without icon */
+            appearance: none;
+            -webkit-appearance: none;
+            background-image: url("data:image/svg+xml;charset=US-ASCII,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20width%3D%22292.4%22%20height%3D%22292.4%22%3E%3Cpath%20fill%3D%22%236366f1%22%20d%3D%22M287%2069.4a17.6%2017.6%200%200%200-13-5.4H18.4c-5%200-9.3%201.8-12.9%205.4A17.6%2017.6%200%200%200%200%2082.2c0%205%201.8%209.3%205.4%2012.9l128%20127.9c3.6%203.6%207.8%205.4%2012.8%205.4s9.2-1.8%2012.8-5.4L287%2095c3.5-3.5%205.4-7.8%205.4-12.8%200-5-1.9-9.2-5.5-12.8z%22%2F%3E%3C%2Fsvg%3E");
+            background-repeat: no-repeat, repeat;
+            background-position: right 14px top 50%, 0 0;
+            background-size: .65em auto, 100%;
+            cursor: pointer;
+        }
         
-        input:focus, textarea:focus { 
+        select option {
+            background-color: var(--sidebar-surface);
+            color: #fff;
+        }
+
+        input::placeholder, textarea::placeholder { color: rgba(136,146,164,0.5); }
+        input:hover, textarea:hover, select:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); }
+        
+        input:focus, textarea:focus, select:focus { 
             border-color: var(--accent); 
             background: var(--sidebar-surface); 
             box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); 
@@ -533,7 +550,7 @@
         .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
 
         /* =========================================================
-           PREVIEW PANEL (DEFAULT)
+           PREVIEW PANEL (MODERN DEFAULT THEME)
            ========================================================= */
         .preview-panel { 
             flex: 1; 
@@ -544,7 +561,7 @@
             padding: 40px; 
             overflow-y: auto; 
             min-width: 0;
-            -webkit-overflow-scrolling: touch;
+            -webkit-overflow-scrolling: touch; 
             background-image: 
                 radial-gradient(circle at 1px 1px, rgba(0,0,0,0.04) 1px, transparent 0);
             background-size: 20px 20px; 
@@ -594,10 +611,11 @@
             display: none; 
             border: 3px solid #1e293b; 
             box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
         }
 
         .cv-photo img { width: 100%; height: 100%; object-fit: cover; }
-        .cv-header-text { flex: 1; }
+        .cv-header-text { flex: 1; transition: all 0.3s ease; }
 
         .cv-name { 
             font-family: 'Playfair Display', serif;
@@ -628,15 +646,16 @@
             flex-wrap: wrap;
             gap: 2px 0;
             align-items: center;
+            transition: all 0.3s ease;
         }
 
         .cv-contact-item { display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
         .cv-contact-sep { margin: 0 8px; color: #cbd5e1; user-select: none; }
         .cv-contact a { color: #2563eb; text-decoration: none; font-weight: 600; display: inline-flex; align-items: center; gap: 5px; white-space: nowrap; }
         .cv-contact a:hover { text-decoration: underline; }
-        .cv-contact i { font-size: 10px; color: #475569; flex-shrink: 0; display: inline-block; }
+        .cv-contact i { font-size: 10px; color: #475569; flex-shrink: 0; display: inline-block; transition: all 0.3s ease;}
         
-        .cv-section { margin-bottom: 16px; }
+        .cv-section { margin-bottom: 16px; transition: all 0.3s ease; }
         
         .cv-heading { 
             font-family: 'Playfair Display', serif;
@@ -656,10 +675,11 @@
             color: #334155; 
             white-space: pre-wrap; 
             line-height: 1.65; 
+            transition: all 0.3s ease;
         }
 
         /* =========================================================
-           THEME: JAKE'S CLASSIC (ATS OPTIMIZED)
+           THEME 2: JAKE'S CLASSIC (HARVARD ATS)
            ========================================================= */
         .theme-jake.a4-wrapper { font-family: 'Times New Roman', Times, serif !important; line-height: 1.2 !important; }
         .theme-jake .cv-header-flex { flex-direction: column !important; text-align: center !important; gap: 4px !important; margin-bottom: 12px !important; border-bottom: none !important; padding-bottom: 0 !important; }
@@ -667,11 +687,28 @@
         .theme-jake .cv-name { font-family: 'Times New Roman', Times, serif !important; font-size: 28pt !important; text-transform: none !important; letter-spacing: 0 !important; font-weight: normal !important; margin-bottom: 2px !important;}
         .theme-jake .cv-title { font-style: italic !important; color: #000 !important; font-weight: normal !important; margin-bottom: 6px !important; font-family: 'Times New Roman', Times, serif !important; }
         .theme-jake .cv-contact { justify-content: center !important; color: #000 !important; font-family: 'Times New Roman', Times, serif !important; font-size: 10pt !important; line-height: 1.2 !important; }
-        .theme-jake .cv-contact i { display: none !important; } /* Hidden icons in Jake mode */
+        .theme-jake .cv-contact i { display: none !important; } /* Hidden icons */
         .theme-jake .cv-contact a { color: #000 !important; font-weight: normal !important; }
         .theme-jake .cv-contact-sep { color: #000 !important; margin: 0 5px !important; }
         .theme-jake .cv-heading { font-family: 'Times New Roman', Times, serif !important; border-bottom: 1px solid #000 !important; color: #000 !important; padding-bottom: 2px !important; margin-bottom: 6px !important; font-size: 12pt !important;}
         .theme-jake .cv-content { color: #000 !important; line-height: 1.3 !important; font-family: 'Times New Roman', Times, serif !important; font-size: 10.5pt !important; }
+
+        /* =========================================================
+           THEME 3: TECH MINIMALIST
+           ========================================================= */
+        .theme-tech.a4-wrapper { font-family: 'Inter', sans-serif !important; line-height: 1.4 !important; color: #1e293b !important; }
+        .theme-tech .cv-header-flex { flex-direction: column !important; text-align: left !important; align-items: flex-start !important; gap: 6px !important; margin-bottom: 16px !important; border-bottom: 2px solid var(--accent) !important; padding-bottom: 12px !important; }
+        .theme-tech .cv-photo { display: none !important; }
+        .theme-tech .cv-name { font-family: 'Inter', sans-serif !important; font-size: 24pt !important; font-weight: 900 !important; text-transform: uppercase !important; letter-spacing: -0.5px !important; color: #0f172a !important; margin-bottom: 0 !important;}
+        .theme-tech .cv-title { font-family: 'JetBrains Mono', monospace !important; font-size: 10.5pt !important; color: var(--accent) !important; font-weight: 600 !important; margin-bottom: 8px !important; text-transform: uppercase; letter-spacing: 0.5px; }
+        .theme-tech .cv-contact { justify-content: flex-start !important; color: #475569 !important; font-size: 9pt !important; line-height: 1.4 !important; }
+        .theme-tech .cv-contact i { display: inline-block !important; color: var(--accent) !important; }
+        .theme-tech .cv-contact a { color: #475569 !important; font-weight: 500 !important; }
+        .theme-tech .cv-contact-sep { color: #cbd5e1 !important; margin: 0 6px !important; }
+        .theme-tech .cv-heading { font-family: 'Inter', sans-serif !important; border-bottom: none !important; color: #0f172a !important; padding-bottom: 0 !important; margin-bottom: 8px !important; font-size: 11pt !important; font-weight: 800 !important; letter-spacing: 0.5px !important; text-transform: uppercase; display: flex; align-items: center; gap: 8px; }
+        .theme-tech .cv-heading::after { content: ''; flex: 1; height: 1px; background: #e2e8f0; }
+        .theme-tech .cv-content { color: #334155 !important; line-height: 1.5 !important; font-family: 'Inter', sans-serif !important; font-size: 9.5pt !important; }
+
 
         /* Print */
         @media print {
@@ -700,7 +737,7 @@
             display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
             background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 200; 
             justify-content: center; align-items: center; 
-            padding: 16px;
+            padding: 16px; 
         }
 
         .modal-card { 
@@ -745,7 +782,7 @@
             font-size: 13px; font-weight: 600; color: white; display: flex; align-items: center; gap: 10px;
             z-index: 300; opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
             box-shadow: 0 10px 30px rgba(0,0,0,0.4);
-            max-width: 90vw; width: max-content;
+            max-width: 90vw; width: max-content; 
         }
 
         .toast.show { transform: translateX(-50%) translateY(0); opacity: 1; }
@@ -778,7 +815,10 @@
             .editor-footer { padding: 16px; flex-wrap: wrap; }
             .form-row { flex-direction: column; gap: 0; }
             .form-row .form-group { min-width: 100%; }
-            input[type="text"], input[type="email"], textarea { font-size: 16px !important; }
+            
+            /* IMPORTANT MOBILE FIX: Force 16px font-size to avoid iOS Auto-Zoom */
+            input[type="text"], input[type="email"], textarea, select#themeSelector { font-size: 16px !important; }
+            
             .btn { padding: 12px 16px; font-size: 13px; }
         }
 
@@ -831,15 +871,17 @@
         <aside class="editor-panel" id="editorPanel">
             <div class="editor-scroll-area">
                 
-                <!-- THEME SWITCHER -->
-                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(99, 102, 241, 0.1); padding: 16px; border-radius: 12px; margin-bottom: 24px; border: 1px solid rgba(99, 102, 241, 0.2);">
+                <!-- NEW PRO THEME SWITCHER -->
+                <div style="display: flex; justify-content: space-between; align-items: center; background: rgba(99, 102, 241, 0.1); padding: 16px; border-radius: 12px; margin-bottom: 24px; border: 1px solid rgba(99, 102, 241, 0.2); flex-wrap: wrap; gap: 12px;">
                     <div>
                         <div style="font-size: 13px; font-weight: 700; color: #fff;">Template Theme</div>
-                        <div style="font-size: 11px; color: var(--sidebar-muted); margin-top: 4px;">Switch between Modern & Classic ATS styles</div>
+                        <div style="font-size: 11px; color: var(--sidebar-muted); margin-top: 4px;">Select the best layout for your role</div>
                     </div>
-                    <button type="button" id="btnThemeToggle" onclick="toggleTheme()" class="btn btn-secondary" style="padding: 8px 14px; font-size: 12px; flex: 0; min-width: max-content;">
-                        <i class="fa-solid fa-briefcase"></i> Enable Jake's Theme
-                    </button>
+                    <select id="themeSelector" onchange="changeTheme(this.value)" style="padding: 8px 12px; font-size: 13px; border-radius: 8px; background: rgba(0,0,0,0.4); color: white; border: 1px solid var(--accent); outline: none; cursor: pointer; font-family: inherit; flex-grow: 1; max-width: 200px;">
+                        <option value="modern">Modern Professional</option>
+                        <option value="jake">Jake's Classic (ATS)</option>
+                        <option value="tech">Tech Minimalist</option>
+                    </select>
                 </div>
 
                 <form id="resumeForm" autocomplete="off">
@@ -858,7 +900,7 @@
                             <img id="photoImg" src="" alt="Profile">
                         </div>
                         <div class="photo-controls">
-                            <p>Upload professional headshot (Hidden in Jake Theme)</p>
+                            <p>Upload professional headshot <span style="color:var(--warning); font-size:10px;">(Hidden in Jake & Tech themes)</span></p>
                             <label for="photoUpload"><i class="fa-solid fa-cloud-arrow-up"></i> Choose Image</label>
                             <input type="file" id="photoUpload" accept="image/*">
                             <button type="button" class="photo-remove-btn" onclick="removePhoto()" title="Remove photo">
@@ -1094,30 +1136,26 @@
 
     <script>
         let currentPhotoBase64 = null;
-        let isJakeTheme = false;
+        let currentTheme = 'modern'; // Default Theme State
 
         // ─── Theme Switcher Logic ───
-        function toggleTheme() {
+        function changeTheme(theme) {
             const preview = document.getElementById('resumePreview');
-            const btn = document.getElementById('btnThemeToggle');
-            isJakeTheme = !isJakeTheme;
+            currentTheme = theme;
             
-            if(isJakeTheme) {
+            // Clear old theme classes
+            preview.classList.remove('theme-jake', 'theme-tech');
+            
+            if(theme === 'jake') {
                 preview.classList.add('theme-jake');
-                btn.innerHTML = '<i class="fa-solid fa-palette"></i> Revert to Modern';
-                btn.style.background = 'var(--accent-gradient)';
-                btn.style.color = 'white';
-                btn.style.border = 'none';
-                showToast('Jake Classic Theme Applied!', 'success');
+                showToast("Jake's Classic Theme Applied!", 'success');
+            } else if (theme === 'tech') {
+                preview.classList.add('theme-tech');
+                showToast("Tech Minimalist Theme Applied!", 'success');
             } else {
-                preview.classList.remove('theme-jake');
-                btn.innerHTML = '<i class="fa-solid fa-briefcase"></i> Enable Jake\'s Theme';
-                btn.style.background = 'rgba(255,255,255,0.05)';
-                btn.style.color = 'var(--sidebar-text)';
-                btn.style.border = '1px solid var(--sidebar-border)';
                 showToast('Modern Theme Applied!', 'success');
             }
-            updatePreview();
+            updatePreview(); // Re-render photo and icons based on theme
         }
 
         // ─── Mobile Tab Switching ───
@@ -1240,14 +1278,16 @@
                 ach: document.getElementById('achievementsInput').value.trim()
             };
 
+            // Photo Update (Hides if Jake/Tech Theme is active)
             const photoBox = document.getElementById('prevPhotoBox');
-            if (currentPhotoBase64 && !isJakeTheme) {
+            if (currentPhotoBase64 && currentTheme === 'modern') {
                 photoBox.style.display = 'block';
                 document.getElementById('prevPhoto').src = currentPhotoBase64;
             } else {
                 photoBox.style.display = 'none';
             }
 
+            // Header
             document.getElementById('prevName').textContent = data.name || 'YOUR NAME';
             
             const titleEl = document.getElementById('prevTitle');
@@ -1258,25 +1298,28 @@
                 titleEl.style.display = 'none'; 
             }
             
+            // Contact Building
             let contactParts = [];
+            const showIcons = currentTheme !== 'jake'; // Jake's theme hides icons
             
-            if (data.phone) contactParts.push(`<span class="cv-contact-item">${!isJakeTheme ? '<i class="fa-solid fa-phone"></i> ' : ''}${data.phone}</span>`);
-            if (data.email) contactParts.push(`<span class="cv-contact-item">${!isJakeTheme ? '<i class="fa-solid fa-envelope"></i> ' : ''}${data.email}</span>`);
-            if (data.loc) contactParts.push(`<span class="cv-contact-item">${!isJakeTheme ? '<i class="fa-solid fa-location-dot"></i> ' : ''}${data.loc}</span>`);
+            if (data.phone) contactParts.push(`<span class="cv-contact-item">${showIcons ? '<i class="fa-solid fa-phone"></i> ' : ''}${data.phone}</span>`);
+            if (data.email) contactParts.push(`<span class="cv-contact-item">${showIcons ? '<i class="fa-solid fa-envelope"></i> ' : ''}${data.email}</span>`);
+            if (data.loc) contactParts.push(`<span class="cv-contact-item">${showIcons ? '<i class="fa-solid fa-location-dot"></i> ' : ''}${data.loc}</span>`);
             
             if (data.linkedin) {
                 let lnUrl = data.linkedin.startsWith('http') ? data.linkedin : 'https://' + data.linkedin;
                 let lnDisplay = data.linkedin.replace(/^https?:\/\//, '');
-                contactParts.push(`<a href="${lnUrl}" target="_blank">${!isJakeTheme ? '<i class="fa-brands fa-linkedin"></i> ' : ''}${lnDisplay}</a>`);
+                contactParts.push(`<a href="${lnUrl}" target="_blank">${showIcons ? '<i class="fa-brands fa-linkedin"></i> ' : ''}${lnDisplay}</a>`);
             }
             if (data.github) {
                 let ghUrl = data.github.startsWith('http') ? data.github : 'https://' + data.github;
                 let ghDisplay = data.github.replace(/^https?:\/\//, '');
-                contactParts.push(`<a href="${ghUrl}" target="_blank">${!isJakeTheme ? '<i class="fa-brands fa-github"></i> ' : ''}${ghDisplay}</a>`);
+                contactParts.push(`<a href="${ghUrl}" target="_blank">${showIcons ? '<i class="fa-brands fa-github"></i> ' : ''}${ghDisplay}</a>`);
             }
             
-            document.getElementById('prevContact').innerHTML = contactParts.join('<span class="cv-contact-sep">|</span>') || '<span style="color:#94a3b8; font-style:italic;">Your contact details will appear here</span>';
+            document.getElementById('prevContact').innerHTML = contactParts.join('<span class="cv-contact-sep">|</span>') || '<span style="color:#94a3b8; font-style:italic; font-family: sans-serif;">Your contact details will appear here</span>';
             
+            // Sections
             const toggleSec = (secId, contentId, val, defaultText) => {
                 const sec = document.getElementById(secId);
                 const contentEl = document.getElementById(contentId);
@@ -1285,7 +1328,7 @@
                     contentEl.textContent = val; 
                 } else if (defaultText) {
                     sec.style.display = 'block';
-                    contentEl.innerHTML = `<span style="color:#94a3b8; font-style:italic;">${defaultText}</span>`;
+                    contentEl.innerHTML = `<span style="color:#94a3b8; font-style:italic; font-family: sans-serif;">${defaultText}</span>`;
                 } else { 
                     sec.style.display = 'none'; 
                 }
@@ -1299,6 +1342,7 @@
             toggleSec('secExperience', 'prevExperience', data.exp);
             toggleSec('secAchievements', 'prevAchievements', data.ach);
 
+            // ATS Score
             let score = 0;
             if (data.name.length > 2) score += 5;
             if (data.title.length > 3) score += 10;
@@ -1387,7 +1431,7 @@
                 location: document.getElementById('locationInput').value,
                 linkedin: document.getElementById('linkedinInput').value,
                 github: document.getElementById('githubInput').value,
-                profilePhoto: (!isJakeTheme) ? currentPhotoBase64 : null, // Prevent photo sending in Jake mode
+                profilePhoto: (currentTheme === 'modern') ? currentPhotoBase64 : null, // Prevent photo in strict themes
                 summary: document.getElementById('summaryInput').value,
                 education: document.getElementById('educationInput').value,
                 skills: document.getElementById('skillsInput').value,
@@ -1410,7 +1454,7 @@
                 const url = window.URL.createObjectURL(blob);
                 const a = document.createElement('a');
                 a.href = url;
-                a.download = (payload.name || 'Resume').replace(/\s+/g, '_') + (isJakeTheme ? '_Jake_Classic.pdf' : '_ATS_Pro.pdf');
+                a.download = (payload.name || 'Resume').replace(/\s+/g, '_') + `_${currentTheme.toUpperCase()}_ATS.pdf`;
                 document.body.appendChild(a);
                 a.click();
                 a.remove();
