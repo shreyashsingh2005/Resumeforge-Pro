@@ -1,0 +1,1442 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ResumeForge Pro — Ultimate ATS Builder</title>
+    <meta name="description" content="Build stunning, ATS-friendly resumes with real-time preview and instant PDF generation.">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800;900&family=Playfair+Display:ital,wght@0,500;0,600;0,700;0,800;1,600&family=Lato:wght@300;400;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    
+    <style>
+        /* =========================================================
+           VARIABLES & RESET
+           ========================================================= */
+        :root {
+            --sidebar-bg: #0f1117; 
+            --sidebar-surface: #1a1d27; 
+            --sidebar-border: rgba(255,255,255,0.06);
+            --sidebar-text: #e2e8f0; 
+            --sidebar-muted: #8892a4; 
+            --sidebar-input-bg: rgba(255,255,255,0.04); 
+            --sidebar-input-focus: rgba(255,255,255,0.08);
+            
+            --accent: #6366f1; 
+            --accent-light: #818cf8; 
+            --accent-glow: rgba(99, 102, 241, 0.25); 
+            --accent-gradient: linear-gradient(135deg, #6366f1, #8b5cf6, #a78bfa);
+            --accent-gradient-hover: linear-gradient(135deg, #4f46e5, #7c3aed, #8b5cf6);
+            
+            --preview-bg: #f1f5f9; 
+            --surface: #ffffff; 
+            --border: #e2e8f0; 
+            --text-main: #0f172a; 
+            --text-body: #334155; 
+            --text-muted: #94a3b8;
+            
+            --danger: #f43f5e; 
+            --warning: #f59e0b;
+            --success: #10b981;
+
+            --transition-fast: 0.15s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-smooth: 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-spring: 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+        }
+
+        * { 
+            box-sizing: border-box; 
+            margin: 0; 
+            padding: 0; 
+        }
+
+        body { 
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif; 
+            background: var(--preview-bg); 
+            color: var(--text-main); 
+            height: 100vh; 
+            display: flex; 
+            flex-direction: column; 
+            overflow: hidden; 
+            -webkit-font-smoothing: antialiased; 
+            -moz-osx-font-smoothing: grayscale; 
+        }
+
+        /* =========================================================
+           NAVBAR
+           ========================================================= */
+        .navbar { 
+            background: var(--sidebar-bg); 
+            height: 64px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 0 24px; 
+            border-bottom: 1px solid var(--sidebar-border); 
+            z-index: 50; 
+            box-shadow: 0 4px 20px rgba(0,0,0,0.4);
+            flex-shrink: 0;
+        }
+
+        .navbar-brand { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+        }
+
+        .brand-icon { 
+            width: 36px; 
+            height: 36px; 
+            background: var(--accent-gradient); 
+            border-radius: 10px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            color: white; 
+            font-size: 16px;
+            box-shadow: 0 0 15px var(--accent-glow);
+        }
+
+        .brand-text {
+            font-size: 18px;
+            font-weight: 800;
+            color: #ffffff;
+            letter-spacing: -0.3px;
+        }
+
+        .brand-text span {
+            background: var(--accent-gradient);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .navbar-right {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .ats-badge { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            padding: 6px 16px; 
+            border-radius: 40px; 
+            background: var(--sidebar-surface); 
+            border: 1px solid var(--sidebar-border); 
+        }
+
+        .ats-label { 
+            font-size: 12px; 
+            font-weight: 600; 
+            color: var(--sidebar-muted); 
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        .ats-score-ring { 
+            position: relative; 
+            width: 36px; 
+            height: 36px; 
+        }
+
+        .ats-score-ring svg { 
+            width: 36px; 
+            height: 36px; 
+            transform: rotate(-90deg); 
+        }
+
+        .ring-bg { 
+            fill: none; 
+            stroke: rgba(255,255,255,0.1); 
+            stroke-width: 3; 
+        }
+
+        .ring-fill { 
+            fill: none; 
+            stroke: var(--accent); 
+            stroke-width: 3; 
+            stroke-linecap: round; 
+            stroke-dasharray: 88; 
+            stroke-dashoffset: 88; 
+            transition: 0.8s cubic-bezier(0.4, 0, 0.2, 1); 
+        }
+
+        .ats-score-value { 
+            position: absolute; 
+            inset: 0; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 11px; 
+            font-weight: 700; 
+            color: #fff;
+            font-family: 'JetBrains Mono', monospace; 
+        }
+
+        /* =========================================================
+           MOBILE TOGGLE TABS
+           ========================================================= */
+        .mobile-tabs {
+            display: none;
+            background: var(--sidebar-bg);
+            border-bottom: 1px solid var(--sidebar-border);
+            flex-shrink: 0;
+        }
+
+        .mobile-tabs-inner {
+            display: flex;
+            padding: 0 16px;
+        }
+
+        .mobile-tab {
+            flex: 1;
+            padding: 14px 0;
+            text-align: center;
+            font-size: 13px;
+            font-weight: 700;
+            color: var(--sidebar-muted);
+            background: none;
+            border: none;
+            cursor: pointer;
+            position: relative;
+            transition: color 0.2s;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .mobile-tab.active {
+            color: var(--accent-light);
+        }
+
+        .mobile-tab.active::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 20%;
+            right: 20%;
+            height: 3px;
+            background: var(--accent-gradient);
+            border-radius: 3px 3px 0 0;
+        }
+
+        .mobile-tab:hover {
+            color: var(--sidebar-text);
+        }
+
+        /* =========================================================
+           WORKSPACE & EDITOR
+           ========================================================= */
+        .workspace { 
+            display: flex; 
+            flex: 1;
+            min-height: 0;
+            overflow: hidden;
+        }
+
+        .editor-panel { 
+            width: 550px; 
+            min-width: 420px;
+            background: var(--sidebar-bg); 
+            display: flex; 
+            flex-direction: column; 
+            border-right: 1px solid var(--sidebar-border); 
+            z-index: 10; 
+            box-shadow: 10px 0 30px rgba(0,0,0,0.3);
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        .editor-panel::after {
+            content: '';
+            position: absolute;
+            top: 0; right: 0; bottom: 0; width: 1px;
+            background: linear-gradient(to bottom, var(--accent) 0%, transparent 50%, var(--accent) 100%);
+            opacity: 0.15;
+            pointer-events: none;
+        }
+
+        .editor-scroll-area { 
+            flex: 1; 
+            overflow-y: auto; 
+            padding: 32px; 
+            min-height: 0;
+        }
+
+        .section-header { 
+            display: flex; 
+            align-items: center; 
+            gap: 12px; 
+            margin: 32px 0 20px; 
+        }
+
+        .section-header:first-child { 
+            margin-top: 0; 
+        }
+
+        .section-icon { 
+            width: 32px; 
+            height: 32px; 
+            border-radius: 8px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            font-size: 14px; 
+            background: rgba(99,102,241,0.15); 
+            color: var(--accent-light);
+            flex-shrink: 0;
+        }
+
+        .section-label { 
+            font-size: 13px; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            letter-spacing: 1px; 
+            color: var(--sidebar-text);
+            white-space: nowrap;
+        }
+
+        .section-line { 
+            flex: 1; 
+            height: 1px; 
+            background: var(--sidebar-border); 
+        }
+
+        /* Profile Photo Upload Style */
+        .photo-upload-area { 
+            display: flex; 
+            align-items: center; 
+            gap: 16px; 
+            margin-bottom: 20px; 
+            padding: 14px; 
+            background: var(--sidebar-input-bg); 
+            border-radius: 12px; 
+            border: 1px dashed var(--sidebar-border); 
+            transition: var(--transition-fast);
+        }
+
+        .photo-upload-area:hover {
+            border-color: var(--accent);
+            background: rgba(99,102,241,0.05);
+        }
+
+        .photo-preview { 
+            width: 64px; 
+            height: 64px; 
+            border-radius: 50%; 
+            background: var(--sidebar-surface); 
+            border: 2px solid var(--accent); 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            overflow: hidden; 
+            flex-shrink: 0;
+        }
+
+        .photo-preview img { 
+            width: 100%; 
+            height: 100%; 
+            object-fit: cover; 
+            display: none; 
+        }
+
+        .photo-preview i { 
+            font-size: 22px; 
+            color: var(--sidebar-muted); 
+        }
+
+        .photo-controls { 
+            flex: 1; 
+            min-width: 0;
+        }
+
+        .photo-controls p {
+            font-size: 12px;
+            color: var(--sidebar-muted);
+            margin-bottom: 8px;
+        }
+
+        .photo-controls label { 
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 7px 14px; 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid var(--sidebar-border); 
+            border-radius: 6px; 
+            font-size: 12px; 
+            font-weight: 600; 
+            cursor: pointer; 
+            transition: 0.2s; 
+            color: var(--sidebar-text);
+        }
+
+        .photo-controls label:hover { 
+            background: var(--accent); 
+            border-color: var(--accent);
+            color: white; 
+        }
+
+        .photo-controls input[type="file"] { 
+            display: none; 
+        }
+
+        .photo-remove-btn {
+            background: none;
+            border: none;
+            color: var(--sidebar-muted);
+            font-size: 14px;
+            cursor: pointer;
+            padding: 7px 10px;
+            border-radius: 6px;
+            transition: 0.2s;
+            margin-left: 6px;
+        }
+
+        .photo-remove-btn:hover {
+            color: var(--danger);
+            background: rgba(244, 63, 94, 0.1);
+        }
+
+        /* Form Inputs */
+        .form-group { margin-bottom: 20px; position: relative; }
+        .form-row { display: flex; gap: 16px; }
+        .form-row .form-group { flex: 1; min-width: 0; }
+        .form-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 8px; }
+        
+        .form-header label { 
+            font-size: 12px; 
+            font-weight: 600; 
+            color: var(--sidebar-muted); 
+            transition: color var(--transition-fast);
+            letter-spacing: 0.3px;
+        }
+
+        .form-group:focus-within .form-header label { color: var(--accent-light); }
+        
+        .tool-btn { 
+            background: rgba(255,255,255,0.05); 
+            border: 1px solid var(--sidebar-border); 
+            color: var(--sidebar-muted); 
+            font-size: 11px; 
+            font-weight: 600; 
+            padding: 5px 10px; 
+            border-radius: 6px; 
+            cursor: pointer; 
+            display: inline-flex; 
+            align-items: center; 
+            gap: 5px; 
+            transition: 0.2s; 
+        }
+
+        .tool-btn:hover { 
+            background: var(--sidebar-input-focus); 
+            color: white; 
+            border-color: rgba(255,255,255,0.3); 
+        }
+
+        .input-wrapper { position: relative; }
+        .input-wrapper i { 
+            position: absolute; 
+            left: 14px; 
+            top: 50%; 
+            transform: translateY(-50%);
+            font-size: 14px; 
+            color: var(--sidebar-muted); 
+            pointer-events: none; 
+            transition: color var(--transition-fast);
+        }
+
+        input[type="text"],
+        input[type="email"],
+        textarea { 
+            width: 100%; 
+            padding: 12px 14px 12px 42px; 
+            background: var(--sidebar-input-bg); 
+            border: 1px solid var(--sidebar-border); 
+            border-radius: 8px; 
+            font-size: 14px; 
+            color: #ffffff; 
+            outline: none; 
+            transition: 0.3s; 
+            font-family: 'Inter', sans-serif;
+        }
+
+        input::placeholder, textarea::placeholder { color: rgba(136,146,164,0.5); }
+        input:hover, textarea:hover { border-color: rgba(255,255,255,0.12); background: rgba(255,255,255,0.06); }
+        
+        input:focus, textarea:focus { 
+            border-color: var(--accent); 
+            background: var(--sidebar-surface); 
+            box-shadow: 0 0 0 3px rgba(99, 102, 241, 0.15); 
+        }
+
+        .form-group:focus-within .input-wrapper i { color: var(--accent-light); }
+
+        textarea { 
+            resize: vertical; 
+            min-height: 90px; 
+            padding-left: 14px; 
+            line-height: 1.6;
+        }
+
+        .editor-footer { 
+            padding: 20px 32px; 
+            border-top: 1px solid var(--sidebar-border); 
+            background: rgba(0,0,0,0.3); 
+            display: flex; 
+            gap: 12px; 
+            backdrop-filter: blur(10px);
+            flex-shrink: 0;
+        }
+
+        .btn { 
+            padding: 13px 20px; 
+            border-radius: 10px; 
+            font-size: 14px; 
+            font-weight: 700; 
+            cursor: pointer; 
+            border: none; 
+            display: flex; 
+            align-items: center; 
+            justify-content: center; 
+            gap: 8px; 
+            transition: 0.3s; 
+        }
+
+        .btn-primary { 
+            background: var(--accent-gradient); 
+            color: white; 
+            flex: 2; 
+            box-shadow: 0 4px 15px var(--accent-glow); 
+        }
+
+        .btn-primary:hover { filter: brightness(1.15); transform: translateY(-2px); }
+        .btn-primary:active { transform: scale(0.98); }
+        .btn-primary:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+        .btn-secondary { 
+            background: rgba(255,255,255,0.05); 
+            color: var(--sidebar-text); 
+            border: 1px solid var(--sidebar-border); 
+            flex: 1; 
+        }
+        .btn-secondary:hover { background: rgba(255,255,255,0.1); border-color: rgba(255,255,255,0.2); }
+
+        /* =========================================================
+           PREVIEW PANEL
+           ========================================================= */
+        .preview-panel { 
+            flex: 1; 
+            background: var(--preview-bg); 
+            display: flex; 
+            justify-content: center; 
+            align-items: flex-start;
+            padding: 40px; 
+            overflow-y: auto; 
+            min-width: 0;
+            background-image: 
+                radial-gradient(circle at 1px 1px, rgba(0,0,0,0.04) 1px, transparent 0);
+            background-size: 20px 20px; 
+        }
+
+        .scale-wrapper {
+            transform-origin: top center;
+            transition: transform 0.3s ease;
+            display: flex;
+            justify-content: center;
+            width: 100%;
+        }
+
+        .a4-wrapper { 
+            background: white; 
+            width: 210mm; 
+            min-height: 297mm; 
+            box-shadow: 
+                0 1px 3px rgba(0,0,0,0.08),
+                0 8px 30px rgba(0,0,0,0.12),
+                0 30px 60px rgba(0,0,0,0.06); 
+            padding: 20mm; 
+            color: #000; 
+            font-family: 'Lato', 'Inter', sans-serif; 
+            position: relative;
+            flex-shrink: 0;
+        }
+        
+        .cv-header-flex { 
+            display: flex; 
+            align-items: center; 
+            gap: 22px; 
+            border-bottom: 2.5px solid #1e293b; 
+            padding-bottom: 18px; 
+            margin-bottom: 18px; 
+        }
+
+        .cv-photo { 
+            width: 90px; 
+            height: 90px; 
+            border-radius: 50%; 
+            background: #f1f5f9; 
+            overflow: hidden; 
+            flex-shrink: 0; 
+            display: none; 
+            border: 3px solid #1e293b; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+        }
+
+        .cv-photo img { width: 100%; height: 100%; object-fit: cover; }
+        .cv-header-text { flex: 1; }
+
+        .cv-name { 
+            font-family: 'Playfair Display', serif;
+            font-size: 26pt; 
+            font-weight: 800; 
+            text-transform: uppercase; 
+            color: #0f172a; 
+            letter-spacing: 1.5px; 
+            margin-bottom: 4px; 
+            line-height: 1.15;
+        }
+
+        .cv-title { 
+            font-size: 12.5pt; 
+            color: #475569; 
+            margin-bottom: 10px; 
+            font-weight: 600; 
+            letter-spacing: 0.5px;
+        }
+
+        .cv-contact { 
+            font-size: 9pt; 
+            color: #334155; 
+            line-height: 2;
+            display: flex;
+            flex-wrap: wrap;
+            gap: 2px 0;
+            align-items: center;
+        }
+
+        .cv-contact-item {
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .cv-contact-sep {
+            margin: 0 8px;
+            color: #cbd5e1;
+            user-select: none;
+        }
+        
+        .cv-contact a { 
+            color: #2563eb; 
+            text-decoration: none; 
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            gap: 5px;
+            white-space: nowrap;
+        }
+
+        .cv-contact a:hover { text-decoration: underline; }
+        .cv-contact i { font-size: 10px; color: #475569; flex-shrink: 0; }
+        
+        .cv-section { margin-bottom: 16px; }
+        
+        .cv-heading { 
+            font-family: 'Playfair Display', serif;
+            font-size: 12.5pt; 
+            font-weight: 700; 
+            text-transform: uppercase; 
+            color: #0f172a; 
+            border-bottom: 1.5px solid #cbd5e1; 
+            padding-bottom: 5px; 
+            margin-bottom: 10px; 
+            letter-spacing: 1px;
+        }
+
+        .cv-content { 
+            font-size: 10pt; 
+            color: #334155; 
+            white-space: pre-wrap; 
+            line-height: 1.65; 
+        }
+
+        /* Print */
+        @media print {
+            body * { visibility: hidden; }
+            .scale-wrapper { transform: none !important; margin: 0; padding: 0; }
+            .a4-wrapper, .a4-wrapper * { visibility: visible; }
+            .a4-wrapper { 
+                position: absolute; left: 0; top: 0; 
+                box-shadow: none; border: none; padding: 15mm; margin: 0; 
+                width: 210mm; min-height: 297mm;
+            }
+        }
+
+        /* Scrollbars */
+        ::-webkit-scrollbar { width: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(255,255,255,0.22); }
+        .preview-panel::-webkit-scrollbar-thumb { background: #c1c8d4; }
+        .preview-panel::-webkit-scrollbar-thumb:hover { background: #94a3b8; }
+        
+        /* =========================================================
+           MODALS AND TOASTS
+           ========================================================= */
+        .modal-overlay { 
+            display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; 
+            background: rgba(0,0,0,0.8); backdrop-filter: blur(8px); z-index: 200; 
+            justify-content: center; align-items: center; 
+        }
+
+        .modal-card { 
+            background: var(--sidebar-surface); width: 90%; max-width: 900px; 
+            border-radius: 16px; border: 1px solid var(--sidebar-border); 
+            display: flex; flex-direction: column; max-height: 80vh; 
+            box-shadow: 0 20px 60px rgba(0,0,0,0.6);
+        }
+
+        .modal-header { 
+            padding: 20px 24px; border-bottom: 1px solid var(--sidebar-border); 
+            display: flex; justify-content: space-between; align-items: center; 
+        }
+
+        .modal-header h3 { color: var(--sidebar-text); font-size: 16px; font-weight: 700; display: flex; align-items: center; gap: 10px;}
+
+        .modal-body { padding: 0; overflow-y: auto; }
+
+        table { width: 100%; border-collapse: collapse; }
+        th, td { padding: 14px 24px; text-align: left; border-bottom: 1px solid rgba(255,255,255,0.05); font-size: 13px; color: var(--sidebar-text); }
+        th { background: rgba(0,0,0,0.3); color: var(--sidebar-muted); text-transform: uppercase; font-size: 11px; position: sticky; top: 0; letter-spacing: 1px;}
+        tr:hover td { background: rgba(255,255,255,0.03); }
+        
+        .table-id { color: var(--accent); font-family: 'JetBrains Mono', monospace; font-weight: 500; }
+        .table-name { font-weight: 600; color: var(--sidebar-text); }
+
+        .close-btn { 
+            background: none; border: none; color: var(--sidebar-muted); 
+            font-size: 20px; cursor: pointer; transition: 0.2s;
+            padding: 4px 8px;
+            border-radius: 6px;
+        }
+        .close-btn:hover { color: var(--danger); background: rgba(244,63,94,0.1); }
+
+        .toast {
+            position: fixed; bottom: 30px; right: 30px; padding: 14px 22px; border-radius: 10px;
+            font-size: 13px; font-weight: 600; color: white; display: flex; align-items: center; gap: 10px;
+            z-index: 300; transform: translateY(100px); opacity: 0; transition: all 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+            box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+            max-width: calc(100vw - 60px);
+        }
+
+        .toast.show { transform: translateY(0); opacity: 1; }
+        .toast.error { background: var(--danger); }
+        .toast.success { background: var(--success); }
+
+        /* =========================================================
+           RESPONSIVE — MOBILE / NARROW SCREENS
+           ========================================================= */
+        @media (max-width: 960px) {
+            .navbar {
+                padding: 0 16px;
+                height: 56px;
+            }
+
+            .ats-label { display: none; }
+
+            .mobile-tabs {
+                display: block;
+            }
+
+            .workspace { 
+                flex-direction: column; 
+                position: relative;
+            }
+
+            .editor-panel { 
+                width: 100%; 
+                min-width: unset;
+                height: 100%;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                box-shadow: none;
+                border-right: none;
+                z-index: 5;
+                transition: opacity 0.25s ease, visibility 0.25s ease;
+            }
+
+            .editor-panel.hidden-mobile {
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+            }
+
+            .editor-panel::after {
+                display: none;
+            }
+
+            .preview-panel { 
+                width: 100%;
+                height: 100%;
+                padding: 16px;
+                position: absolute;
+                top: 0;
+                left: 0;
+                right: 0;
+                bottom: 0;
+                z-index: 4;
+                transition: opacity 0.25s ease, visibility 0.25s ease;
+            }
+
+            .preview-panel.hidden-mobile {
+                opacity: 0;
+                visibility: hidden;
+                pointer-events: none;
+            }
+
+            .editor-scroll-area {
+                padding: 20px 16px;
+            }
+
+            .editor-footer {
+                padding: 16px;
+            }
+
+            .form-row {
+                flex-direction: column;
+                gap: 0;
+            }
+
+            .btn {
+                padding: 12px 16px;
+                font-size: 13px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            .brand-text { font-size: 16px; }
+            .brand-icon { width: 32px; height: 32px; font-size: 14px; }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- NAVBAR -->
+    <nav class="navbar">
+        <div class="navbar-brand">
+            <div class="brand-icon">
+                <i class="fa-solid fa-file-shield"></i>
+            </div>
+            <div class="brand-text">Resume<span>Forge Pro</span></div>
+        </div>
+        <div class="navbar-right">
+            <div class="ats-badge" title="ATS Compatibility Score">
+                <span class="ats-label">ATS Score</span>
+                <div class="ats-score-ring">
+                    <svg viewBox="0 0 36 36">
+                        <circle class="ring-bg" cx="18" cy="18" r="14"/>
+                        <circle class="ring-fill" id="atsRing" cx="18" cy="18" r="14"/>
+                    </svg>
+                    <span class="ats-score-value" id="atsScore">0</span>
+                </div>
+            </div>
+        </div>
+    </nav>
+
+    <!-- MOBILE TOGGLE TABS -->
+    <div class="mobile-tabs">
+        <div class="mobile-tabs-inner">
+            <button class="mobile-tab active" id="tabEditor" onclick="switchTab('editor')">
+                <i class="fa-solid fa-pen-to-square"></i> Editor
+            </button>
+            <button class="mobile-tab" id="tabPreview" onclick="switchTab('preview')">
+                <i class="fa-solid fa-eye"></i> Preview
+            </button>
+        </div>
+    </div>
+
+    <!-- WORKSPACE -->
+    <div class="workspace">
+        
+        <!-- EDITOR PANEL -->
+        <aside class="editor-panel" id="editorPanel">
+            <div class="editor-scroll-area">
+                <form id="resumeForm" autocomplete="off">
+
+                    <!-- Profile & Info -->
+                    <div class="section-header">
+                        <div class="section-icon"><i class="fa-solid fa-user-tie"></i></div>
+                        <span class="section-label">Profile & Info</span>
+                        <div class="section-line"></div>
+                    </div>
+
+                    <!-- Photo Upload -->
+                    <div class="photo-upload-area">
+                        <div class="photo-preview" id="photoPreview">
+                            <i class="fa-solid fa-user" id="photoIcon"></i>
+                            <img id="photoImg" src="" alt="Profile">
+                        </div>
+                        <div class="photo-controls">
+                            <p>Upload professional headshot (Optional)</p>
+                            <label for="photoUpload"><i class="fa-solid fa-cloud-arrow-up"></i> Choose Image</label>
+                            <input type="file" id="photoUpload" accept="image/*">
+                            <button type="button" class="photo-remove-btn" onclick="removePhoto()" title="Remove photo">
+                                <i class="fa-solid fa-trash"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="form-header"><label>Full Name</label></div>
+                            <div class="input-wrapper">
+                                <i class="fa-regular fa-id-badge"></i>
+                                <input type="text" id="nameInput" placeholder="Shreyash Singh" oninput="updatePreview()" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-header"><label>Professional Title</label></div>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-briefcase"></i>
+                                <input type="text" id="titleInput" placeholder="Entry-Level Programmer" oninput="updatePreview()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="form-header"><label>Email Address</label></div>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-envelope"></i>
+                                <input type="email" id="emailInput" placeholder="shreyashsingh9717@gmail.com" oninput="updatePreview()" required>
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-header"><label>Phone Number</label></div>
+                            <div class="input-wrapper">
+                                <i class="fa-solid fa-phone"></i>
+                                <input type="text" id="phoneInput" placeholder="+91-8810504263" oninput="updatePreview()" required>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-header"><label>Location</label></div>
+                        <div class="input-wrapper">
+                            <i class="fa-solid fa-location-dot"></i>
+                            <input type="text" id="locationInput" placeholder="Ghaziabad, Uttar Pradesh" oninput="updatePreview()">
+                        </div>
+                    </div>
+
+                    <div class="form-row">
+                        <div class="form-group">
+                            <div class="form-header"><label>LinkedIn</label></div>
+                            <div class="input-wrapper">
+                                <i class="fa-brands fa-linkedin-in"></i>
+                                <input type="text" id="linkedinInput" placeholder="linkedin.com/in/shrey" oninput="updatePreview()">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <div class="form-header"><label>GitHub / Portfolio</label></div>
+                            <div class="input-wrapper">
+                                <i class="fa-brands fa-github"></i>
+                                <input type="text" id="githubInput" placeholder="github.com/shrey" oninput="updatePreview()">
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Core Content -->
+                    <div class="section-header">
+                        <div class="section-icon"><i class="fa-solid fa-layer-group"></i></div>
+                        <span class="section-label">Core Content</span>
+                        <div class="section-line"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-header">
+                            <label>Professional Summary</label>
+                            <button type="button" class="tool-btn" onclick="formatBullets('summaryInput')"><i class="fa-solid fa-wand-magic-sparkles"></i> Clean</button>
+                        </div>
+                        <textarea id="summaryInput" placeholder="Motivated BCA student seeking an internship or entry-level software development opportunity to apply programming skills, learn modern technologies, and contribute to real-world projects." oninput="updatePreview()"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-header">
+                            <label>Technical Skills</label>
+                            <button type="button" class="tool-btn" onclick="formatBullets('skillsInput')"><i class="fa-solid fa-list-ul"></i> Bullets</button>
+                        </div>
+                        <textarea id="skillsInput" placeholder="• Database: MySQL&#10;• Tools: Git, GitHub, VS Code, MS Office&#10;• OS: Windows&#10;• Core: Problem Solving, HTML, CSS, C++" oninput="updatePreview()"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-header">
+                            <label>Strengths</label>
+                            <button type="button" class="tool-btn" onclick="formatBullets('strengthsInput')"><i class="fa-solid fa-list-ul"></i> Bullets</button>
+                        </div>
+                        <textarea id="strengthsInput" placeholder="• Problem Solving&#10;• Team Management&#10;• Effective Communication" oninput="updatePreview()"></textarea>
+                    </div>
+
+                    <!-- Experience & Details -->
+                    <div class="section-header">
+                        <div class="section-icon"><i class="fa-solid fa-award"></i></div>
+                        <span class="section-label">Experience & Details</span>
+                        <div class="section-line"></div>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-header">
+                            <label>Education</label>
+                            <button type="button" class="tool-btn" onclick="formatBullets('educationInput')"><i class="fa-solid fa-list-ul"></i> Bullets</button>
+                        </div>
+                        <textarea id="educationInput" placeholder="Bachelor of Computer Applications (BCA)&#10;Hi-Tech Institute of Engineering and Technology&#10;• Affiliated to CCS University" oninput="updatePreview()"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-header">
+                            <label>Projects</label>
+                            <button type="button" class="tool-btn" onclick="formatBullets('projectsInput')"><i class="fa-solid fa-list-ul"></i> Bullets</button>
+                        </div>
+                        <textarea id="projectsInput" placeholder="Student Management System&#10;• Developed a menu-driven C++ application for managing student records.&#10;• Implemented add, search, update and delete features." oninput="updatePreview()"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-header">
+                            <label>Experience</label>
+                            <button type="button" class="tool-btn" onclick="formatBullets('experienceInput')"><i class="fa-solid fa-list-ul"></i> Bullets</button>
+                        </div>
+                        <textarea id="experienceInput" placeholder="• Internship / Freelance details here..." oninput="updatePreview()"></textarea>
+                    </div>
+
+                    <div class="form-group">
+                        <div class="form-header">
+                            <label>Key Achievements</label>
+                            <button type="button" class="tool-btn" onclick="formatBullets('achievementsInput')"><i class="fa-solid fa-list-ul"></i> Bullets</button>
+                        </div>
+                        <textarea id="achievementsInput" placeholder="• Website Optimization: Increased website engagement by 50% with responsive design.&#10;• Software Debugging: Successfully debugged and resolved 15 software issues." oninput="updatePreview()"></textarea>
+                    </div>
+
+                </form>
+            </div>
+
+            <div class="editor-footer">
+                <button type="button" class="btn btn-secondary" onclick="openDatabase()">
+                    <i class="fa-solid fa-database"></i> Records
+                </button>
+                <button type="submit" form="resumeForm" class="btn btn-primary" id="btnSubmit">
+                    <i class="fa-solid fa-file-pdf"></i> Generate ATS PDF
+                </button>
+            </div>
+        </aside>
+
+        <!-- PREVIEW PANEL -->
+        <main class="preview-panel" id="previewPanel">
+            <div class="scale-wrapper" id="scaleWrapper">
+                <div class="a4-wrapper" id="resumePreview">
+                    
+                    <div class="cv-header-flex">
+                        <div class="cv-photo" id="prevPhotoBox">
+                            <img id="prevPhoto" src="" alt="Profile">
+                        </div>
+                        <div class="cv-header-text">
+                            <div class="cv-name" id="prevName">SHREYASH SINGH</div>
+                            <div class="cv-title" id="prevTitle">Entry-Level Programmer</div>
+                            <div class="cv-contact" id="prevContact"></div>
+                        </div>
+                    </div>
+                    
+                    <div class="cv-section" id="secSummary">
+                        <div class="cv-heading">Summary</div>
+                        <div class="cv-content" id="prevSummary">...</div>
+                    </div>
+                    
+                    <div class="cv-section" id="secEducation">
+                        <div class="cv-heading">Education</div>
+                        <div class="cv-content" id="prevEducation">...</div>
+                    </div>
+                    
+                    <div class="cv-section" id="secSkills">
+                        <div class="cv-heading">Technical Skills</div>
+                        <div class="cv-content" id="prevSkills">...</div>
+                    </div>
+
+                    <div class="cv-section" id="secStrengths">
+                        <div class="cv-heading">Strengths</div>
+                        <div class="cv-content" id="prevStrengths">...</div>
+                    </div>
+                    
+                    <div class="cv-section" id="secProjects">
+                        <div class="cv-heading">Projects</div>
+                        <div class="cv-content" id="prevProjects">...</div>
+                    </div>
+                    
+                    <div class="cv-section" id="secExperience">
+                        <div class="cv-heading">Experience</div>
+                        <div class="cv-content" id="prevExperience">...</div>
+                    </div>
+                    
+                    <div class="cv-section" id="secAchievements">
+                        <div class="cv-heading">Key Achievements</div>
+                        <div class="cv-content" id="prevAchievements">...</div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- DATABASE MODAL -->
+    <div class="modal-overlay" id="dbModal" onclick="closeDatabase()">
+        <div class="modal-card" onclick="event.stopPropagation()">
+            <div class="modal-header">
+                <h3><i class="fa-solid fa-server" style="color: var(--accent);"></i> System Records</h3>
+                <button class="close-btn" onclick="closeDatabase()"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="modal-body">
+                <table>
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>Candidate Name</th>
+                            <th>Email Address</th>
+                            <th>Phone</th>
+                        </tr>
+                    </thead>
+                    <tbody id="resumeTableBody"></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- TOAST -->
+    <div class="toast" id="toast"></div>
+
+    <script>
+        let currentPhotoBase64 = null;
+
+        // ─── Mobile Tab Switching ───
+        function switchTab(tab) {
+            const editorPanel = document.getElementById('editorPanel');
+            const previewPanel = document.getElementById('previewPanel');
+            const tabEditor = document.getElementById('tabEditor');
+            const tabPreview = document.getElementById('tabPreview');
+
+            if (tab === 'editor') {
+                editorPanel.classList.remove('hidden-mobile');
+                previewPanel.classList.add('hidden-mobile');
+                tabEditor.classList.add('active');
+                tabPreview.classList.remove('active');
+            } else {
+                editorPanel.classList.add('hidden-mobile');
+                previewPanel.classList.remove('hidden-mobile');
+                tabEditor.classList.remove('active');
+                tabPreview.classList.add('active');
+                setTimeout(handleResize, 50);
+            }
+        }
+
+        // ─── Auto Scaling for Preview ───
+        function handleResize() {
+            const previewPanel = document.getElementById('previewPanel');
+            const scaleWrapper = document.getElementById('scaleWrapper');
+            if (!previewPanel || !scaleWrapper) return;
+            
+            const availableWidth = previewPanel.clientWidth - 40;
+            const a4Width = 794;
+
+            if (availableWidth < a4Width) {
+                const scale = Math.max(0.3, availableWidth / a4Width);
+                scaleWrapper.style.transform = `scale(${scale})`;
+            } else {
+                scaleWrapper.style.transform = `scale(1)`;
+            }
+        }
+
+        window.addEventListener('resize', handleResize);
+        setTimeout(handleResize, 100);
+
+        // ─── Image Upload Logic ───
+        document.getElementById('photoUpload').addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    currentPhotoBase64 = event.target.result;
+                    document.getElementById('photoImg').src = currentPhotoBase64;
+                    document.getElementById('photoImg').style.display = 'block';
+                    document.getElementById('photoIcon').style.display = 'none';
+                    updatePreview();
+                };
+                reader.readAsDataURL(file);
+            }
+        });
+
+        function removePhoto() {
+            currentPhotoBase64 = null;
+            document.getElementById('photoUpload').value = '';
+            document.getElementById('photoImg').style.display = 'none';
+            document.getElementById('photoIcon').style.display = 'block';
+            updatePreview();
+        }
+
+        // ─── Text Formatter ───
+        function formatBullets(elementId) {
+            const el = document.getElementById(elementId);
+            const lines = el.value.split('\n');
+            const formatted = lines.map(line => {
+                line = line.trim();
+                if (line && !line.startsWith('•') && !line.startsWith('-') && line.length > 15) {
+                    return '• ' + line;
+                }
+                return line;
+            }).join('\n');
+            el.value = formatted;
+            updatePreview();
+        }
+
+        // ─── ATS Score Logic ───
+        const atsRing = document.getElementById('atsRing');
+        const atsScoreEl = document.getElementById('atsScore');
+        const circumference = 2 * Math.PI * 14; 
+
+        function setAtsScore(score) {
+            const offset = circumference - (score / 100) * circumference;
+            atsRing.style.strokeDasharray = circumference;
+            atsRing.style.strokeDashoffset = offset;
+            atsScoreEl.textContent = score;
+
+            if (score < 40) {
+                atsRing.style.stroke = 'var(--danger)';
+            } else if (score < 80) {
+                atsRing.style.stroke = 'var(--warning)';
+            } else {
+                atsRing.style.stroke = 'var(--success)';
+            }
+        }
+
+        // ─── Live Preview Mapper ───
+        function updatePreview() {
+            const data = {
+                name: document.getElementById('nameInput').value.trim(),
+                title: document.getElementById('titleInput').value.trim(),
+                email: document.getElementById('emailInput').value.trim(),
+                phone: document.getElementById('phoneInput').value.trim(),
+                loc: document.getElementById('locationInput').value.trim(),
+                linkedin: document.getElementById('linkedinInput').value.trim(),
+                github: document.getElementById('githubInput').value.trim(),
+                summary: document.getElementById('summaryInput').value.trim(),
+                edu: document.getElementById('educationInput').value.trim(),
+                skills: document.getElementById('skillsInput').value.trim(),
+                strengths: document.getElementById('strengthsInput').value.trim(),
+                proj: document.getElementById('projectsInput').value.trim(),
+                exp: document.getElementById('experienceInput').value.trim(),
+                ach: document.getElementById('achievementsInput').value.trim()
+            };
+
+            // Photo Update
+            const photoBox = document.getElementById('prevPhotoBox');
+            if (currentPhotoBase64) {
+                photoBox.style.display = 'block';
+                document.getElementById('prevPhoto').src = currentPhotoBase64;
+            } else {
+                photoBox.style.display = 'none';
+            }
+
+            // Header
+            document.getElementById('prevName').textContent = data.name || 'YOUR NAME';
+            
+            const titleEl = document.getElementById('prevTitle');
+            if (data.title) { 
+                titleEl.textContent = data.title; 
+                titleEl.style.display = 'block'; 
+            } else { 
+                titleEl.style.display = 'none'; 
+            }
+            
+            // Contact — build with proper separators showing actual values
+            let contactParts = [];
+            if (data.phone) contactParts.push(`<span class="cv-contact-item"><i class="fa-solid fa-phone"></i> ${data.phone}</span>`);
+            if (data.email) contactParts.push(`<span class="cv-contact-item"><i class="fa-solid fa-envelope"></i> ${data.email}</span>`);
+            if (data.loc) contactParts.push(`<span class="cv-contact-item"><i class="fa-solid fa-location-dot"></i> ${data.loc}</span>`);
+            
+            if (data.linkedin) {
+                let lnUrl = data.linkedin.startsWith('http') ? data.linkedin : 'https://' + data.linkedin;
+                // Show actual URL text, not just "LinkedIn"
+                let lnDisplay = data.linkedin.replace(/^https?:\/\//, '');
+                contactParts.push(`<a href="${lnUrl}" target="_blank"><i class="fa-brands fa-linkedin"></i> ${lnDisplay}</a>`);
+            }
+            if (data.github) {
+                let ghUrl = data.github.startsWith('http') ? data.github : 'https://' + data.github;
+                // Show actual URL text, not just "GitHub"
+                let ghDisplay = data.github.replace(/^https?:\/\//, '');
+                contactParts.push(`<a href="${ghUrl}" target="_blank"><i class="fa-brands fa-github"></i> ${ghDisplay}</a>`);
+            }
+            
+            document.getElementById('prevContact').innerHTML = contactParts.join('<span class="cv-contact-sep">|</span>') || '<span style="color:#94a3b8; font-style:italic;">Your contact details will appear here</span>';
+            
+            // Sections
+            const toggleSec = (secId, contentId, val, defaultText) => {
+                const sec = document.getElementById(secId);
+                const contentEl = document.getElementById(contentId);
+                if (val) { 
+                    sec.style.display = 'block'; 
+                    contentEl.textContent = val; 
+                } else if (defaultText) {
+                    sec.style.display = 'block';
+                    contentEl.innerHTML = `<span style="color:#94a3b8; font-style:italic;">${defaultText}</span>`;
+                } else { 
+                    sec.style.display = 'none'; 
+                }
+            };
+
+            toggleSec('secSummary', 'prevSummary', data.summary, 'Your professional summary will appear here...');
+            toggleSec('secEducation', 'prevEducation', data.edu, 'Your educational background will appear here...');
+            toggleSec('secSkills', 'prevSkills', data.skills, 'Your technical skills will appear here...');
+            toggleSec('secStrengths', 'prevStrengths', data.strengths);
+            toggleSec('secProjects', 'prevProjects', data.proj, 'Your project details will appear here...');
+            toggleSec('secExperience', 'prevExperience', data.exp);
+            toggleSec('secAchievements', 'prevAchievements', data.ach);
+
+            // ATS Score
+            let score = 0;
+            if (data.name.length > 2) score += 5;
+            if (data.title.length > 3) score += 10;
+            if (data.email.includes('@')) score += 5;
+            if (data.phone.length > 8) score += 5;
+            if (data.loc.length > 3) score += 5;
+            if (data.linkedin) score += 5;
+            if (data.github) score += 5;
+            if (data.summary.length > 20) score += 10;
+            if (data.skills.length > 15) score += 15;
+            if (data.proj.length > 20) score += 15;
+            if (data.edu.length > 10) score += 10;
+            if (data.exp.length > 10 || data.ach.length > 10) score += 10;
+            
+            setAtsScore(Math.min(score, 100));
+        }
+
+        // ─── Toasts ───
+        function showToast(message, type = 'error') {
+            const toast = document.getElementById('toast');
+            toast.className = `toast ${type}`;
+            toast.innerHTML = `<i class="fa-solid fa-${type === 'error' ? 'circle-exclamation' : 'circle-check'}"></i> ${message}`;
+            toast.classList.add('show');
+            setTimeout(() => toast.classList.remove('show'), 4000);
+        }
+
+        // ─── Database Logic ───
+        function openDatabase() {
+            document.getElementById('dbModal').style.display = 'flex';
+            const tbody = document.getElementById('resumeTableBody');
+            tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:40px; color: var(--sidebar-muted);">
+                <i class="fa-solid fa-circle-notch fa-spin" style="font-size:24px; color: var(--accent); margin-bottom: 12px; display: block;"></i>
+                Syncing with Server...
+            </td></tr>`;
+
+            fetch('http://localhost:8080/api/resume/all')
+                .then(res => res.json())
+                .then(data => {
+                    tbody.innerHTML = '';
+                    if (!data.length) {
+                        tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:40px; color: var(--sidebar-muted);">
+                            <i class="fa-solid fa-inbox" style="font-size:30px; display:block; margin-bottom:10px; opacity: 0.3;"></i>
+                            No resumes found.
+                        </td></tr>`;
+                        return;
+                    }
+                    data.forEach(r => {
+                        tbody.innerHTML += `<tr>
+                            <td class="table-id">#${r.id}</td>
+                            <td class="table-name">${r.name}</td>
+                            <td>${r.email}</td>
+                            <td>${r.phone}</td>
+                        </tr>`;
+                    });
+                })
+                .catch(() => {
+                    tbody.innerHTML = `<tr><td colspan="4" style="text-align:center; padding:40px;">
+                        <i class="fa-solid fa-server" style="font-size:30px; display:block; margin-bottom:10px; color: var(--danger);"></i>
+                        <span style="color: var(--danger); font-weight: 600;">Server Offline</span><br>
+                        <span style="color: var(--sidebar-muted); font-size: 13px;">Ensure the backend is running on port 8080.</span>
+                    </td></tr>`;
+                });
+        }
+
+        function closeDatabase() { 
+            document.getElementById('dbModal').style.display = 'none'; 
+        }
+        
+        document.addEventListener('keydown', (e) => { 
+            if (e.key === 'Escape') closeDatabase(); 
+        });
+
+        // ─── Generate PDF via API ───
+        document.getElementById('resumeForm').addEventListener('submit', function (e) {
+            e.preventDefault();
+            const btn = document.getElementById('btnSubmit');
+            const originalHTML = btn.innerHTML;
+            btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> <span>Processing...</span>';
+            btn.disabled = true;
+
+            const payload = {
+                name: document.getElementById('nameInput').value,
+                title: document.getElementById('titleInput').value,
+                email: document.getElementById('emailInput').value,
+                phone: document.getElementById('phoneInput').value,
+                location: document.getElementById('locationInput').value,
+                linkedin: document.getElementById('linkedinInput').value,
+                github: document.getElementById('githubInput').value,
+                profilePhoto: currentPhotoBase64,
+                summary: document.getElementById('summaryInput').value,
+                education: document.getElementById('educationInput').value,
+                skills: document.getElementById('skillsInput').value,
+                strengths: document.getElementById('strengthsInput').value,
+                projects: document.getElementById('projectsInput').value,
+                experience: document.getElementById('experienceInput').value,
+                achievements: document.getElementById('achievementsInput').value
+            };
+
+            fetch('http://localhost:8080/api/resume/generate', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            })
+            .then(res => { 
+                if (!res.ok) throw new Error(); 
+                return res.blob(); 
+            })
+            .then(blob => {
+                const url = window.URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = (payload.name || 'Resume').replace(/\s+/g, '_') + '_ATS_Pro_Resume.pdf';
+                document.body.appendChild(a);
+                a.click();
+                a.remove();
+                window.URL.revokeObjectURL(url);
+
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                showToast('PDF compiled & downloaded!', 'success');
+            })
+            .catch(() => {
+                btn.innerHTML = originalHTML;
+                btn.disabled = false;
+                showToast('Server Error. Ensure backend is running on port 8080.');
+            });
+        });
+
+        // Init
+        setAtsScore(0);
+        updatePreview();
+    </script>
+</body>
+</html>
