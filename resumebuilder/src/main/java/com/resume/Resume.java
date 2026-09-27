@@ -16,7 +16,7 @@ public class Resume {
     private String phone;
     private String location; 
     
-    @Column(columnDefinition = "LONGTEXT")
+    @Column(columnDefinition = "TEXT")
     private String profilePhoto; // Naya: Base64 Image
     
     // Links
